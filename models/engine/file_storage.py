@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-"""Module serializes instances to a JSON file and
+"""
+Module serializes instances to a JSON file and
 deserializes JSON file to instances
 """
 import json
