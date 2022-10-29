@@ -7,6 +7,7 @@ import json
 
 from models.base_model import BaseModel
 
+
 class FileStorage:
     """
     serializes instances to a JSON
@@ -45,13 +46,14 @@ class FileStorage:
         (only if the JSON file (__file_path) exists
         """
         defined_classes = {
-            "BaseModel" : BaseModel
+            "BaseModel": BaseModel
         }
         try:
             tmp_dict = {}
             with open(self.__file_path, "r") as read_file:
                 for key, value in json.load(read_file).items():
-                    tmp_dict[key] = defined_classes[value["__class__"]](**value)
+                    tmp_dict[key] = defined_classes[value["__class__"]](
+                        **value)
 
             self.__objects = tmp_dict
 
