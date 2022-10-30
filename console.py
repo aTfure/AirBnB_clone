@@ -2,9 +2,10 @@
 """contains the entry point of the command interpreter
 """
 import cmd
+
+from models import storage
 from models.base_model import BaseModel
 from models.user import User
-from models import storage
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
@@ -17,12 +18,12 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = "(hbnb) "
     airbnb_engine_classes = {
-        "BaseModel": BaseModel,
         "User": User,
+        "BaseModel": BaseModel,
+        "Place": Place,
         "State": State,
         "City": City,
         "Amenity": Amenity,
-        "Place": Place,
         "Review": Review
     }
 
