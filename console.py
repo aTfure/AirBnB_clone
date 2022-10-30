@@ -135,6 +135,7 @@ class HBNBCommand(cmd.Cmd):
                 if arg == type(value).__name__:
                     value_list.append(value.__str__())
             print(value_list)
+            return
         else:
             print("** class doesn't exist *")
             return
@@ -195,6 +196,8 @@ class HBNBCommand(cmd.Cmd):
             else:
                 setattr(class_instance, attribute, value)
                 storage.save()
+            return
+        return
 
 
 if __name__ == '__main__':
