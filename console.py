@@ -3,7 +3,13 @@
 """
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
@@ -11,12 +17,19 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = "(hbnb) "
     airbnb_engine_classes = {
-        "BaseModel": BaseModel
+        "BaseModel": BaseModel,
+        "User": User,
+        "State": State,
+        "City": City,
+        "Amenity": Amenity,
+        "Place": Place,
+        "Review": Review
     }
 
     def do_EOF(self, arg):
         """exit the program
         """
+        print()
         return True
 
     def do_quit(self, arg):
@@ -106,16 +119,82 @@ class HBNBCommand(cmd.Cmd):
         """
         Prints all string representation of all
         instances based or not on the class name
+        $ all BaseModel or $ all.
         """
-        pass
+        value_list = []
+        objects = storage.all()
+
+        if not arg:
+            for value in objects.values():
+                value_list.append(value.__str__())
+            print(value_list)
+            return
+
+        if arg in self.airbnb_engine_classes:
+            for value in objects.values():
+                if arg == type(value).__name__:
+                    value_list.append(value.__str__())
+            print(value_list)
+        else:
+            print("** class doesn't exist *")
+            return
 
     def do_update(self, arg):
         """
         Updates an instance based on the class
         name and id by adding or updating attribute
         (save the change into the JSON file)
+        Ex: $ update BaseModel 1234-1234-1234
+            email "aibnb@mail.com".
         """
-        pass
+        arg_list = arg.split()
+        length = len(arg_list)
+        if length == 0:
+            print("** class name missing **")
+            return
+
+        base_model = arg_list[0]
+
+        if base_model not in self.airbnb_engine_classes:
+            print("** class doesn't exist **")
+            return
+
+        if length == 1:
+            print("** instance id missing **")
+            return
+
+        objects = storage.all()
+
+        obj_key = base_model + "." + arg_list[1]
+
+        if obj_key not in objects:
+            print("** no instance found **")
+            return
+
+        if length == 2:
+            print("** attribute name missing **")
+            return
+
+        if length == 3:
+            print("** value missing **")
+            return
+
+        class_instance = objects[obj_key]
+        attribute, value = arg_list[2], arg_list[3]
+        value = str(value)
+
+        if hasattr(class_instance, attribute):
+            attr_type = type(getattr(class_instance, attribute))
+
+            if attr_type == int:
+                setattr(class_instance, attribute, int(value))
+                storage.save()
+            elif attr_type == float:
+                setattr(class_instance, attribute, float(value))
+                storage.save()
+            else:
+                setattr(class_instance, attribute, value)
+                storage.save()
 
 
 if __name__ == '__main__':
