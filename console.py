@@ -52,11 +52,13 @@ class HBNBCommand(cmd.Cmd):
             return
 
         try:
-            base_model = self.airbnb_engine_classes[arg]()
+            args = arg.split()
+            base_model = self.airbnb_engine_classes[args[0]]()
             base_model.save()
             print(base_model.id)
         except KeyError as ex:
             print("** class doesn't exist **")
+            return
 
     def do_show(self, arg):
         """
@@ -190,16 +192,8 @@ class HBNBCommand(cmd.Cmd):
 
         if hasattr(class_instance, attribute):
             attr_type = type(getattr(class_instance, attribute))
-
-            if attr_type == int:
-                setattr(class_instance, attribute, int(value))
-                storage.save()
-            elif attr_type == float:
-                setattr(class_instance, attribute, float(value))
-                storage.save()
-            else:
-                setattr(class_instance, attribute, value)
-                storage.save()
+            setattr(class_instance, attribute, attr_type(value))
+            class_instance.save()
             return
         return
 
