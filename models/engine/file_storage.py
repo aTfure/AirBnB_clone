@@ -44,7 +44,7 @@ class FileStorage:
         for key, value in self.__objects.items():
             tmp_dict[key] = value.to_dict()
 
-        with open(self.__file_path, "w", encoding="utf-8") as write_file:
+        with open(self.__file_path, "w") as write_file:
             json.dump(tmp_dict, write_file)
 
     def reload(self):
@@ -61,13 +61,10 @@ class FileStorage:
             "Review": Review
         }
         try:
-            tmp_dict = {}
             with open(self.__file_path, "r") as read_file:
                 for key, value in json.load(read_file).items():
-                    tmp_dict[key] = defined_classes[value["__class__"]](
+                    self.__objects[key] = defined_classes[value["__class__"]](
                         **value)
-
-            self.__objects = tmp_dict
 
         except Exception as ex:
             pass
