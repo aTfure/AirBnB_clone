@@ -26,10 +26,14 @@ class HBNBCommand(cmd.Cmd):
         "Review": Review
     }
 
+    def emptyline(self):
+        """Handles empty line
+        """
+        pass
+
     def do_EOF(self, arg):
         """exit the program
         """
-        print()
         return True
 
     def do_quit(self, arg):
@@ -198,6 +202,12 @@ class HBNBCommand(cmd.Cmd):
                 storage.save()
             return
         return
+
+    def default(self, line):
+        """Handles defaults
+        """
+        print('default({})'.format(line))
+        return super().default(line)
 
 
 if __name__ == '__main__':
