@@ -27,7 +27,7 @@ class HBNBCommand(cmd.Cmd):
         "Amenity": Amenity,
         "Review": Review
     }
-
+        
     def emptyline(self):
         """Handles empty line
         """
