@@ -228,13 +228,9 @@ class HBNBCommand(cmd.Cmd):
                 arg1 = args[0] + " " + arg[1]
                 self.do_destroy(arg1)
         elif args[0] in self.airbnb_engine_classes and args[1].startswith('update'):
-            start = 'update('
-            end = ')'
-            arg = re.findall(re.escape(start)+"(.*)" +
-                             re.escape(end), args[1])[0]
-            arg = arg.replace('(', '').replace(')', '').replace(',', '')
-            arg = arg.replace('"', '')
-            arg1 = args[0] + " " + arg
+            args = (arg.replace("(", ".").replace(")", ".")
+            .replace('"', "").replace(",", "").split("."))
+            arg1 = args[0] + " " + args[2]
             self.do_update(arg1)
         else:
             print("*** Unknown syntax: {}".format(arg))
