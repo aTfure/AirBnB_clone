@@ -3,6 +3,7 @@
 """
 import cmd
 import re
+import shlex
 
 from models import storage
 from models.base_model import BaseModel
@@ -156,50 +157,34 @@ class HBNBCommand(cmd.Cmd):
         Ex: $ update BaseModel 1234-1234-1234
             email "aibnb@mail.com".
         """
-        arg_list = arg.split()
-        length = len(arg_list)
-        if length == 0:
+        _input = shlex.split(_input)
+        query_key = ''
+
+        if len(_input) == 0:
             print("** class name missing **")
             return
-
-        base_model = arg_list[0]
-
-        if base_model not in self.airbnb_engine_classes:
+        if _input[0] not in self.keyss:
             print("** class doesn't exist **")
             return
-
-        if length == 1:
+        if len(_input) == 1:
             print("** instance id missing **")
             return
-
-        storage.reload()
-        objects = storage.all()
-
-        obj_key = base_model + "." + arg_list[1]
-
-        if obj_key not in objects:
+        if len(_input) > 1:
+            query_key = _input[0] + '.' + _input[1]
+        if query_key not in models.storage.all().keys():
             print("** no instance found **")
             return
-
-        if length == 2:
-            print("** attribute name missing **")
+        if len(_input) == 2:
+            print('** attribute name missing **')
             return
-
-        if length == 3:
-            print("** value missing **")
+        if len(_input) == 3:
+            print('** value missing **')
             return
+        key_name = _input[2]
+        input_value = _input[3]
+        setattr(models.storage.all()[query_key], key_name, input_value)
 
-        class_instance = objects[obj_key]
-        attribute, value = arg_list[2], arg_list[3]
-        value = str(value)
-
-        if hasattr(class_instance, attribute):
-            attr_type = type(getattr(class_instance, attribute))
-            setattr(class_instance, attribute, attr_type(value))
-            objects.save()
-
-            return
-        return
+        models.storage.all()[query_key].save()
 
     def default(self, arg):
         """Handles defaults arguments not created
