@@ -3,7 +3,6 @@
 """
 import cmd
 import re
-import shlex
 
 from models import storage
 from models.base_model import BaseModel
@@ -157,35 +156,46 @@ class HBNBCommand(cmd.Cmd):
         Ex: $ update BaseModel 1234-1234-1234
             email "aibnb@mail.com".
         """
-        args = shlex.split(arg)
-        length = len(args)
-        query_key = ''
-
+        arg_list = arg.split()
+        length = len(arg_list)
         if length == 0:
             print("** class name missing **")
             return
-        if args[0] not in self.airbnb_engine_classes:
+
+        base_model = arg_list[0]
+
+        if base_model not in self.airbnb_engine_classes:
             print("** class doesn't exist **")
             return
+
         if length == 1:
             print("** instance id missing **")
             return
-        if length > 1:
-            query_key = args[0] + '.' + args[1]
-        if query_key not in storage.all().keys():
+
+        objects = storage.all()
+
+        obj_key = base_model + "." + arg_list[1]
+
+        if obj_key not in objects:
             print("** no instance found **")
             return
-        if length == 2:
-            print('** attribute name missing **')
-            return
-        if length == 3:
-            print('** value missing **')
-            return
-        key_name = args[2]
-        input_value = args[3]
-        setattr(storage.all()[query_key], key_name, input_value)
 
-        storage.all()[query_key].save()
+        if length == 2:
+            print("** attribute name missing **")
+            return
+
+        if length == 3:
+            print("** value missing **")
+            return
+
+        class_instance = objects[obj_key]
+        attribute, value = arg_list[2], arg_list[3]
+        value = str(value)
+
+        if hasattr(class_instance, attribute):
+            attr_type = type(getattr(class_instance, attribute))
+            setattr(class_instance, attribute, attr_type(value))
+            objects.save()
 
     def default(self, arg):
         """Handles defaults arguments not created
