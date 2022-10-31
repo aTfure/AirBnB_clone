@@ -3,7 +3,6 @@
 """
 import cmd
 import re
-import shlex
 
 from models import storage
 from models.base_model import BaseModel
@@ -157,7 +156,7 @@ class HBNBCommand(cmd.Cmd):
         Ex: $ update BaseModel 1234-1234-1234
             email "aibnb@mail.com".
         """
-        arg_list = shlex.split(arg)
+        arg_list = arg.split()
         length = len(arg_list)
         if length == 0:
             print("** class name missing **")
@@ -192,8 +191,10 @@ class HBNBCommand(cmd.Cmd):
 
         class_instance = objects[obj_key]
         attribute, value = arg_list[2], arg_list[3]
+        value = str(value)
 
-        setattr(class_instance, attribute, value)
+        attr_type = type(getattr(class_instance, attribute))
+        setattr(class_instance, attribute, attr_type(value))
         class_instance.save()
 
     def default(self, arg):
