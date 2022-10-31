@@ -2,6 +2,7 @@
 """contains the entry point of the command interpreter
 """
 import cmd
+import re
 
 from models import storage
 from models.base_model import BaseModel
@@ -199,11 +200,44 @@ class HBNBCommand(cmd.Cmd):
             return
         return
 
-    def default(self, line):
-        """Handles defaults
+    def default(self, arg):
+        """Handles defaults arguments not created
         """
-        print('default({})'.format(line))
-        return super().default(line)
+        count = 0
+        args = arg.split(".")
+
+        if args[0] in self.airbnb_engine_classes and args[1] == "all()":
+            self.do_all(args[0])
+        elif args[0] in self.airbnb_engine_classes and args[1] == "count()":
+            if (args[0] not in self.airbnb_engine_classes):
+                print("** class doesn't exist **")
+                return (False)
+            else:
+                for key in storage.all():
+                    if key.startswith(args[0]):
+                        count += 1
+                print(count)
+        elif args[0] in self.airbnb_engine_classes and args[1].startswith('show'):
+            arg = args[1].split('"')
+            if len(arg) == 3:
+                arg1 = args[0] + " " + arg[1]
+                self.do_show(arg1)
+        elif args[0] in self.airbnb_engine_classes and args[1].startswith('destroy'):
+            arg = args[1].split('"')
+            if len(arg) == 3:
+                arg1 = args[0] + " " + arg[1]
+                self.do_destroy(arg1)
+        elif args[0] in self.airbnb_engine_classes and args[1].startswith('update'):
+            start = 'update('
+            end = ')'
+            arg = re.findall(re.escape(start)+"(.*)" +
+                             re.escape(end), args[1])[0]
+            arg = arg.replace('(', '').replace(')', '').replace(',', '')
+            arg = arg.replace('"', '')
+            arg1 = args[0] + " " + arg
+            self.do_update(arg1)
+        else:
+            print("*** Unknown syntax: {}".format(arg))
 
 
 if __name__ == '__main__':
