@@ -192,10 +192,8 @@ class HBNBCommand(cmd.Cmd):
 
         class_instance = objects[obj_key]
         attribute, value = arg_list[2], arg_list[3]
-        value = str(value)
 
-        attr_type = type(getattr(class_instance, attribute))
-        setattr(class_instance, attribute, attr_type(value))
+        setattr(class_instance, attribute, value)
         objects.save()
 
     def default(self, arg):
