@@ -194,7 +194,7 @@ class HBNBCommand(cmd.Cmd):
         attribute, value = arg_list[2], arg_list[3]
 
         setattr(class_instance, attribute, value)
-        objects.save()
+        class_instance.save()
 
     def default(self, arg):
         """Handles defaults arguments not created
