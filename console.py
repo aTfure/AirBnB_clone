@@ -172,6 +172,7 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
             return
 
+        storage.reload()
         objects = storage.all()
 
         obj_key = base_model + "." + arg_list[1]
