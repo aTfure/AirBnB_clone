@@ -157,31 +157,32 @@ class HBNBCommand(cmd.Cmd):
         Ex: $ update BaseModel 1234-1234-1234
             email "aibnb@mail.com".
         """
-        _input = shlex.split(_input)
+        args = shlex.split(arg)
+        length = len(args)
         query_key = ''
 
-        if len(_input) == 0:
+        if length == 0:
             print("** class name missing **")
             return
-        if _input[0] not in self.airbnb_engine_classes:
+        if args[0] not in self.airbnb_engine_classes:
             print("** class doesn't exist **")
             return
-        if len(_input) == 1:
+        if length == 1:
             print("** instance id missing **")
             return
-        if len(_input) > 1:
-            query_key = _input[0] + '.' + _input[1]
+        if length > 1:
+            query_key = args[0] + '.' + args[1]
         if query_key not in storage.all().keys():
             print("** no instance found **")
             return
-        if len(_input) == 2:
+        if length == 2:
             print('** attribute name missing **')
             return
-        if len(_input) == 3:
+        if length == 3:
             print('** value missing **')
             return
-        key_name = _input[2]
-        input_value = _input[3]
+        key_name = args[2]
+        input_value = args[3]
         setattr(storage.all()[query_key], key_name, input_value)
 
         storage.all()[query_key].save()
