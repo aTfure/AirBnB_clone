@@ -61,10 +61,13 @@ class FileStorage:
             "Review": Review
         }
         try:
+            temp_dict = {}
             with open(self.__file_path, "r") as read_file:
-                for key, value in json.load(read_file).items():
-                    self.__objects[key] = defined_classes[value["__class__"]](
-                        **value)
+                realoded_dict = json.load(read_file)
+            for key, value in realoded_dict.items():
+                if value['__class__'] in defined_classes:
+                    temp_dict[key] = defined_classes[value['__class__']](**value)
+            self.__objects = temp_dict
 
         except Exception as ex:
             pass
