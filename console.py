@@ -174,7 +174,8 @@ class HBNBCommand(cmd.Cmd):
 
         objects = storage.all()
 
-        obj_key = base_model + "." + arg_list[1]
+        if length > 1:
+            obj_key = arg_list[0] + '.' + arg_list[1]
 
         if obj_key not in objects:
             print("** no instance found **")
