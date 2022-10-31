@@ -192,10 +192,9 @@ class HBNBCommand(cmd.Cmd):
         attribute, value = arg_list[2], arg_list[3]
         value = str(value)
 
-        if hasattr(class_instance, attribute):
-            attr_type = type(getattr(class_instance, attribute))
-            setattr(class_instance, attribute, attr_type(value))
-            objects.save()
+        attr_type = type(getattr(class_instance, attribute))
+        setattr(class_instance, attribute, attr_type(value))
+        objects.save()
 
     def default(self, arg):
         """Handles defaults arguments not created
