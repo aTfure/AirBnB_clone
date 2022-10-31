@@ -2,9 +2,12 @@
 """contains the entry point of the command interpreter
 """
 import cmd
+import re
+from shlex import split
+
+from models import storage
 from models.base_model import BaseModel
 from models.user import User
-from models import storage
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
@@ -17,19 +20,58 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = "(hbnb) "
     airbnb_engine_classes = {
-        "BaseModel": BaseModel,
         "User": User,
+        "BaseModel": BaseModel,
+        "Place": Place,
         "State": State,
         "City": City,
         "Amenity": Amenity,
-        "Place": Place,
         "Review": Review
     }
+
+def parse(arg):
+    curly_braces = re.search(r"\{(.*?)\}", arg)
+    brackets = re.search(r"\[(.*?)\]", arg)
+    if curly_braces is None:
+        if brackets is None:
+            return [i.strip(",") for i in split(arg)]
+        else:
+            lexer = split(arg[:brackets.span()[0]])
+            retl = [i.strip(",") for i in lexer]
+            retl.append(brackets.group())
+            return retl
+    else:
+        lexer = split(arg[:curly_braces.span()[0]])
+        retl = [i.strip(",") for i in lexer]
+        retl.append(curly_braces.group())
+        return retl
+
+
+def check_args(args):
+    """checks if args is valid
+    Args:
+        args (str): the string containing the arguments passed to a command
+    Returns:
+        Error message if args is None or not a valid class, else the arguments
+    """
+    arg_list = parse(args)
+
+    if len(arg_list) == 0:
+        print("** class name missing **")
+    elif arg_list[0] not in CLASSES:
+        print("** class doesn't exist **")
+    else:
+        return arg_list
+
+        
+    def emptyline(self):
+        """Handles empty line
+        """
+        pass
 
     def do_EOF(self, arg):
         """exit the program
         """
-        print()
         return True
 
     def do_quit(self, arg):
@@ -48,11 +90,13 @@ class HBNBCommand(cmd.Cmd):
             return
 
         try:
-            base_model = self.airbnb_engine_classes[arg]()
+            args = arg.split()
+            base_model = self.airbnb_engine_classes[args[0]]()
             base_model.save()
             print(base_model.id)
         except KeyError as ex:
             print("** class doesn't exist **")
+            return
 
     def do_show(self, arg):
         """
@@ -135,6 +179,7 @@ class HBNBCommand(cmd.Cmd):
                 if arg == type(value).__name__:
                     value_list.append(value.__str__())
             print(value_list)
+            return
         else:
             print("** class doesn't exist *")
             return
@@ -185,16 +230,53 @@ class HBNBCommand(cmd.Cmd):
 
         if hasattr(class_instance, attribute):
             attr_type = type(getattr(class_instance, attribute))
+            setattr(class_instance, attribute, attr_type(value))
+            class_instance.save()
 
-            if attr_type == int:
-                setattr(class_instance, attribute, int(value))
-                storage.save()
-            elif attr_type == float:
-                setattr(class_instance, attribute, float(value))
-                storage.save()
+            return
+        return
+
+    def default(self, arg):
+        """Handles defaults arguments not created
+        """
+        count = 0
+        args = arg.split(".")
+
+        if args[0] in self.airbnb_engine_classes and args[1] == "all()":
+            self.do_all(args[0])
+        elif args[0] in self.airbnb_engine_classes and args[1] == "count()":
+            if (args[0] not in self.airbnb_engine_classes):
+                print("** class doesn't exist **")
+                return (False)
             else:
-                setattr(class_instance, attribute, value)
-                storage.save()
+                for key in storage.all():
+                    if key.startswith(args[0]):
+                        count += 1
+                print(count)
+        elif args[0] in self.airbnb_engine_classes and \
+                args[1].startswith('show'):
+            arg = args[1].split('"')
+            if len(arg) == 3:
+                arg1 = args[0] + " " + arg[1]
+                self.do_show(arg1)
+        elif args[0] in self.airbnb_engine_classes and \
+                args[1].startswith('destroy'):
+            arg = args[1].split('"')
+            if len(arg) == 3:
+                arg1 = args[0] + " " + arg[1]
+                self.do_destroy(arg1)
+        elif args[0] in self.airbnb_engine_classes and \
+                args[1].startswith('update'):
+            start = 'update('
+            end = ')'
+            arg = re.findall(re.escape(start)+"(.*)" +
+                             re.escape(end), args[1])[0]
+            arg = arg.replace('(', '').replace(')', '').replace(',', '')
+            arg = arg.replace('"', '')
+            arg1 = args[0] + " " + arg
+            self.do_update(arg1)
+        else:
+            print("*** Unknown syntax: {}".format(arg))
 
 
 if __name__ == '__main__':
