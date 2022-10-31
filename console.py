@@ -217,19 +217,22 @@ class HBNBCommand(cmd.Cmd):
                     if key.startswith(args[0]):
                         count += 1
                 print(count)
-        elif args[0] in self.airbnb_engine_classes and args[1].startswith('show'):
+        elif args[0] in self.airbnb_engine_classes and \
+                args[1].startswith('show'):
             arg = args[1].split('"')
             if len(arg) == 3:
                 arg1 = args[0] + " " + arg[1]
                 self.do_show(arg1)
-        elif args[0] in self.airbnb_engine_classes and args[1].startswith('destroy'):
+        elif args[0] in self.airbnb_engine_classes and \
+                args[1].startswith('destroy'):
             arg = args[1].split('"')
             if len(arg) == 3:
                 arg1 = args[0] + " " + arg[1]
                 self.do_destroy(arg1)
-        elif args[0] in self.airbnb_engine_classes and args[1].startswith('update'):
-            args = (arg.replace("(", ".").replace(")", ".")
-            .replace('"', "").replace(",", "").split("."))
+        elif args[0] in self.airbnb_engine_classes and \
+                args[1].startswith('update'):
+            args = (arg.replace("(", ".").replace(")", ".").replace(
+                '"', "").strip(".").split("."))
             arg1 = args[0] + " " + args[2]
             self.do_update(arg1)
         else:
