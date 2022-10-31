@@ -33,13 +33,13 @@ class BaseModel:
     def __str__(self):
         """returns [<class name>] (<self.id>) <self.__dict__>
         """
-        return "[{}] ({}) {}".format(type(self).__name__,
+        return "[{:s}] ({:s}) {}".format(type(self).__name__,
                                      self.id, self.__dict__)
 
     def __repr__(self):
         """returns [<class name>] (<self.id>) <self.__dict__>
         """
-        return "[{}] ({}) {}".format(type(self).__name__,
+        return "[{:s}] ({:s}) {}".format(type(self).__name__,
                                      self.id, self.__dict__)
 
     def save(self):

@@ -85,7 +85,7 @@ class HBNBCommand(cmd.Cmd):
                     return
 
             else:
-                print("** class doesn't exist *")
+                print("** class doesn't exist ***")
                 return
 
         except ValueError as ex:
@@ -116,7 +116,7 @@ class HBNBCommand(cmd.Cmd):
                     return
 
             else:
-                print("** class doesn't exist *")
+                print("** class doesn't exist **")
                 return
 
         except ValueError as ex:
@@ -145,7 +145,7 @@ class HBNBCommand(cmd.Cmd):
             print(value_list)
             return
         else:
-            print("** class doesn't exist *")
+            print("** class doesn't exist **")
             return
 
     def do_update(self, arg):
