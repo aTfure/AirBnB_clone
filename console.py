@@ -3,7 +3,6 @@
 """
 import cmd
 import re
-import shlex
 
 from models import storage
 from models.base_model import BaseModel
@@ -28,6 +27,8 @@ class HBNBCommand(cmd.Cmd):
         "Amenity": Amenity,
         "Review": Review
     }
+
+    dict_keys = airbnb_engine_classes.keys()
 
     def emptyline(self):
         """Handles empty line
@@ -75,7 +76,7 @@ class HBNBCommand(cmd.Cmd):
 
         try:
             class_name, id = arg.split()
-            if class_name in self.airbnb_engine_classes:
+            if class_name in self.dict_keys:
                 key = class_name + "." + id
                 objects = storage.all()
                 if key not in objects:
@@ -105,7 +106,7 @@ class HBNBCommand(cmd.Cmd):
 
         try:
             class_name, id = arg.split()
-            if class_name in self.airbnb_engine_classes:
+            if class_name in self.dict_keys:
                 key = class_name + "." + id
                 objects = storage.all()
                 if key not in objects:
@@ -139,7 +140,7 @@ class HBNBCommand(cmd.Cmd):
             print(value_list)
             return
 
-        if arg in self.airbnb_engine_classes:
+        if arg in self.dict_keys:
             for value in objects.values():
                 if arg == type(value).__name__:
                     value_list.append(value.__str__())
@@ -157,34 +158,49 @@ class HBNBCommand(cmd.Cmd):
         Ex: $ update BaseModel 1234-1234-1234
             email "aibnb@mail.com".
         """
-        _input = shlex.split(_input)
-        query_key = ''
-
-        if len(_input) == 0:
+        arg_list = arg.split()
+        length = len(arg_list)
+        if length == 0:
             print("** class name missing **")
             return
-        if _input[0] not in self.keyss:
+
+        base_model = arg_list[0]
+
+        if base_model not in self.dict_keys:
             print("** class doesn't exist **")
             return
-        if len(_input) == 1:
+
+        if length == 1:
             print("** instance id missing **")
             return
-        if len(_input) > 1:
-            query_key = _input[0] + '.' + _input[1]
-        if query_key not in models.storage.all().keys():
+
+        objects = storage.all()
+
+        obj_key = base_model + "." + arg_list[1]
+
+        if obj_key not in objects:
             print("** no instance found **")
             return
-        if len(_input) == 2:
-            print('** attribute name missing **')
-            return
-        if len(_input) == 3:
-            print('** value missing **')
-            return
-        key_name = _input[2]
-        input_value = _input[3]
-        setattr(models.storage.all()[query_key], key_name, input_value)
 
-        models.storage.all()[query_key].save()
+        if length == 2:
+            print("** attribute name missing **")
+            return
+
+        if length == 3:
+            print("** value missing **")
+            return
+
+        class_instance = objects[obj_key]
+        attribute, value = arg_list[2], arg_list[3]
+        value = str(value)
+
+        if hasattr(class_instance, attribute):
+            attr_type = type(getattr(class_instance, attribute))
+            setattr(class_instance, attribute, attr_type(value))
+            objects.save()
+
+            return
+        return
 
     def default(self, arg):
         """Handles defaults arguments not created
@@ -192,10 +208,10 @@ class HBNBCommand(cmd.Cmd):
         count = 0
         args = arg.split(".")
 
-        if args[0] in self.airbnb_engine_classes and args[1] == "all()":
+        if args[0] in self.dict_keys and args[1] == "all()":
             self.do_all(args[0])
-        elif args[0] in self.airbnb_engine_classes and args[1] == "count()":
-            if (args[0] not in self.airbnb_engine_classes):
+        elif args[0] in self.dict_keys and args[1] == "count()":
+            if (args[0] not in self.dict_keys):
                 print("** class doesn't exist **")
                 return (False)
             else:
@@ -203,19 +219,19 @@ class HBNBCommand(cmd.Cmd):
                     if key.startswith(args[0]):
                         count += 1
                 print(count)
-        elif args[0] in self.airbnb_engine_classes and \
+        elif args[0] in self.dict_keys and \
                 args[1].startswith('show'):
             arg = args[1].split('"')
             if len(arg) == 3:
                 arg1 = args[0] + " " + arg[1]
                 self.do_show(arg1)
-        elif args[0] in self.airbnb_engine_classes and \
+        elif args[0] in self.dict_keys and \
                 args[1].startswith('destroy'):
             arg = args[1].split('"')
             if len(arg) == 3:
                 arg1 = args[0] + " " + arg[1]
                 self.do_destroy(arg1)
-        elif args[0] in self.airbnb_engine_classes and \
+        elif args[0] in self.dict_keys and \
                 args[1].startswith('update'):
             start = 'update('
             end = ')'
