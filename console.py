@@ -27,7 +27,7 @@ class HBNBCommand(cmd.Cmd):
         "Amenity": Amenity,
         "Review": Review
     }
-        
+
     def emptyline(self):
         """Handles empty line
         """
@@ -195,7 +195,7 @@ class HBNBCommand(cmd.Cmd):
         if hasattr(class_instance, attribute):
             attr_type = type(getattr(class_instance, attribute))
             setattr(class_instance, attribute, attr_type(value))
-            class_instance.save()
+            objects.save()
 
             return
         return
